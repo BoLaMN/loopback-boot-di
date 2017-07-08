@@ -65,7 +65,11 @@ module.exports = (app) ->
 
       return 
 
-    @provider 'config', (isEmpty, merge, path, glob, env) ->
+    @provider 'config', (isEmpty, inflector, injector, merge, path, glob, env) ->
+      { dasheize, underscore, camelize } = inflector
+
+      directories = app.directories.map (directory) ->
+        path.join directory, 'configs'
 
       addWithSuffixes = (list, base, suffixes...) ->
         add = (element) ->
@@ -82,147 +86,165 @@ module.exports = (app) ->
 
             add base
 
-      configs = @configs = {}
+      build = (list) ->
+        files = []
 
-      @$get = (parsers, env, inflector) -> 
-        { dasheize, underscore, camelize } = inflector
+        parsers = injector.get 'parsers'
 
         node = env['NODE_ENV'] or 'dev'
         node_app = env['NODE_APP_INSTANCE']
         
-        service = 
-          configs: configs
+        list.forEach (base) =>
+          base = parsers.tokens(base) or base
 
-          files: (list) ->
-            files = []
+          addWithSuffixes files, base, node_app
+          addWithSuffixes files, base, node, node_app
 
-            list.forEach (base) =>
-              base = parsers.tokens(base) or base
+        files
 
-              addWithSuffixes files, base, node_app
-              addWithSuffixes files, base, node, node_app
+      get = (dirs, configs, fn) ->
+        if typeof configs is 'function'
+          return get directories, dirs, configs
 
-            files
+        if not Array.isArray dirs 
+          dirs = [ dirs ]
 
-          glob: (dirs, configs, fn) ->
-            if not Array.isArray dirs 
-              dirs = [ dirs ]
+        parsers = injector.get 'parsers'
+            
+        names = configs.join ',' 
+        exts = parsers.exts.join ','
 
-            names = configs.join ',' 
-            exts = parsers.exts.join ','
+        pattern = '{' + names + '}.{' + exts + '}'
 
-            pattern = '{' + names + '}.{' + exts + '}'
+        for dir in dirs
+          ptrn = path.resolve path.join dir, pattern
+          files = glob.sync ptrn
 
-            for dir in dirs
-              ptrn = path.resolve path.join dir, pattern
-              files = glob.sync ptrn
+          for file in files
+            fn file, require file 
 
-              for file in files
-                fn file, require file 
+        return
 
-            return
+      one = (file, dirs = directories) ->
+        name = path.basename file
+        base = name.split('.')[0] 
 
-          one: (dirs, file) ->
-            name = path.basename file
-            base = name.split('.')[0] 
+        data = load [ file ], dirs
 
-            data = @load dirs, [ file ]
+        data[base]
 
-            data[base]
+      load = (list, dirs = directories) ->
+        if not Array.isArray dirs 
+          dirs = [ dirs ]
 
-          load: (dirs, list) ->
-            if not Array.isArray dirs 
-              dirs = [ dirs ]
+        result = {}
 
-            files = @files list
+        files = build list
 
-            @glob dirs, files, (file, config) =>
-              name = path.basename file
-              base = name.split('.')[0] 
+        get dirs, files, (file, config) =>
+          name = path.basename file
+          base = name.split('.')[0] 
 
-              @configs[base] = merge @configs[base] or {}, config
+          result[base] = merge result[base] or {}, config
 
-            @configs
+        result
 
-          from: (conf, dirs, list) ->
-            files = Object.keys list 
+      from = (list, dirs = directories) ->
+        result = {}
 
-            files.forEach (file) ->
-              orig = file.toLowerCase()
+        files = Object.keys list 
 
-              dash = dasheize file 
+        files.forEach (file) ->
+          orig = file.toLowerCase()
 
-              if dash isnt orig
-                files.push dash
+          dash = dasheize file 
 
-              under = underscore file 
+          if dash isnt orig
+            files.push dash
 
-              if under isnt orig
-                files.push under
+          under = underscore file 
 
-            @glob dirs, files, (file, config) =>
-              ext = path.extname file
-              name = path.basename file, ext
-              base = camelize name.split('.')[0] 
+          if under isnt orig
+            files.push under
 
-              conf[base] = list[base]
+        get dirs, files, (file, config) =>
+          ext = path.extname file
+          name = path.basename file, ext
+          base = camelize name.split('.')[0] 
 
-              if typeof config is 'function'
-                conf[base] ?= {}
-                conf[base].fn = config
-              else 
-                conf[base] = merge conf[base] or {}, config
+          result[base] = list[base]
 
-            conf
+          if typeof config is 'function'
+            result[base] ?= {}
+            result[base].fn = config
+          else 
+            result[base] = merge result[base] or {}, config
 
-        service
+        result
+      
+      @$get = -> 
+
+        config = one 'config'
+        config.get = get
+        config.load = load
+        config.one = one
+        config.build = build 
+        config.from = from 
+
+        config
 
     @provider 'models', ->
       configs = {}
 
       @$get = (config) ->
+        info = config.one 'model-config'
+        dirs = info._meta.sources
 
-        configs: configs
-
-        load: ->
-          info = config.configs['model-config']
-          dirs = info._meta.sources
-
-          config.from configs, dirs, info
-          
-          configs
+        configs = config.from info, dirs 
+        configs
 
     @provider 'mixins', ->
       configs = {}
 
       @$get = (config) ->
 
-        configs: configs
+        info = config.one 'model-config'
+        dirs = info._meta.mixins 
 
-        load: ->
-          info = config.configs['model-config']
-          dirs = info._meta.mixins 
+        configs = config.from info, dirs    
+        configs
 
-          config.from configs, dirs, info
-          
-          configs
+    @provider 'components', ->
+      configs = {}
 
-    @run (config, env, models, mixins, path) ->
-      directories = app.directories.map (directory) ->
-        path.join directory, 'configs'
+      @$get = (config) ->
 
-      conf = config.one directories, 'config'
+        info = config.one 'component-config'
+        dirs = Object.keys info 
 
-      env.extend conf
+        configs = config.from info, dirs
+        configs
 
-      config.load directories, [
-        'component-config'
-        'datasources'
-        'model-config'
-        'middleware'
-      ]
+    @provider 'middleware', ->
 
-      models.load() 
-      mixins.load() 
+      @$get = (config) ->
+        config.one 'middleware'
 
+    @provider 'datasources', ->
 
+      @$get = (config) ->
+        config.one 'datasources'
+
+    @provider 'boot', ->
+      configs = []
+
+      @$get = (config, path) ->
+
+        dirs = app.directories.map (directory) ->
+          path.join directory, 'boot'
+
+        config.get dirs, [ '**' ], (file, config) =>
+          if typeof config is 'function'
+            configs.push config
+
+        configs
