@@ -1,0 +1,60 @@
+db:
+  name: "db"
+  connector: "memory"
+
+mongo:
+  name: "mongo"
+  connector: "mongo"
+  host: '${MONGO_HOST}'
+  port: '${MONGO_PORT}'
+  database: '${MONGO_DBNAME}'
+  username: '${MONGO_USER}'
+  password: '${MONGO_PASS}'
+  connectionTimeout: 300000
+  connectTimeoutMS: 300000
+  socketTimeoutMS: 300000
+  server:
+    auto_reconnect: true
+    reconnectTries: 100
+    reconnectInterval: 1000
+
+transient:
+  name: 'transient'
+  connector: 'transient'
+
+redis:
+  name: 'redis'
+  connector: 'redis'
+  host: '${REDIS_HOST}'
+
+email:
+  name: 'mail'
+  connector: 'mail'
+  transports: [
+    {
+      type: 'ses'
+      region: '${AWS_REGION}'
+      accessKeyId: '${AWS_ACCESS_KEY_ID}'
+      secretAccessKey: '${AWS_SECRET_ACCESS_KEY}'
+    }
+  ]
+
+auth:
+  name: 'auth'
+  connector: 'internal'
+  url: '${auth}'
+  auth:
+    url: '${auth}'
+    id: '${id}'
+    secret: '${secret}'
+    key: '${key}'
+
+rmc:
+  name: 'rmc'
+  connector: 'internal'
+  url: '${rmc}'
+  auth:
+    url: '${auth}'
+    id: '${id}'
+    secret: '${secret}'
+    key: '${key}'

@@ -1,0 +1,256 @@
+_meta:
+  mixins: [
+    "loopback/common/mixins"
+    "loopback/server/mixins"
+    "../common/mixins"
+    "./mixins"
+  ]
+  sources: [
+    "loopback/common/models"
+    "loopback/server/models"
+    "../common/models"
+    "./models"
+    "./models/decision"
+    "./models/queue"
+    "./models/chat"
+    "./models/flow"
+    "./models/job"
+    "./models/card"
+    "./models/product"
+    "./models/user"
+    "./models/deadline"
+  ]
+
+Card:
+  dataSource: "mongo"
+
+CardType:
+  dataSource: false
+  public: false
+
+CardManager:
+  dataSource: false
+  public: false
+
+LayoutDefinition:
+  dataSource: 'mongo'
+
+Queue:
+  dataSource: "mongo"
+  public: false
+
+Task:
+  dataSource: "mongo"
+
+Worker:
+  dataSource: false
+  public: false
+
+Workflow:
+  dataSource: false
+  public: false
+
+Log:
+  dataSource: false
+  public: false
+
+Profiler:
+  dataSource: false
+  public: false
+
+Step:
+  dataSource: false
+  public: false
+
+ACL:
+  dataSource: "mongo"
+  public: false
+
+AccessToken:
+  dataSource: "redis"
+  public: false
+
+Message:
+  dataSource: "mongo"
+  public: false
+
+ColumnProperty:
+  dataSource: "transient"
+  public: false
+
+CustomField:
+  dataSource: "mongo"
+  public: false
+
+CustomFieldItem:
+  dataSource: "transient"
+  public: false
+
+Customer:
+  dataSource: "rmc"
+
+Deadline:
+  dataSource: "mongo"
+
+DeadlinePolicy:
+  dataSource: "transient"
+  public: false
+
+DeadlinePolicyEntry:
+  dataSource: "transient"
+  public: false
+
+Decision:
+  dataSource: "mongo"
+
+DecisionAnalytic:
+  dataSource: "mongo"
+  public: false
+
+DecisionAnalyticRule:
+  dataSource: "transient"
+  public: false
+
+DecisionAnalyticRuleCondition:
+  dataSource: "transient"
+  public: false
+
+DecisionAnalyticVariant:
+  dataSource: "transient"
+  public: false
+
+DecisionChangelog:
+  dataSource: "mongo"
+  public: false
+
+DecisionDiff:
+  dataSource: "mongo"
+  public: false
+
+DecisionField:
+  dataSource: "transient"
+  public: false
+
+DecisionGroup:
+  dataSource: "mongo"
+
+DecisionHistory:
+  dataSource: "mongo"
+  public: false
+
+DecisionHistoryRule:
+  dataSource: "transient"
+  public: false
+
+DecisionHistoryRuleCondition:
+  dataSource: "transient"
+  public: false
+
+DecisionRule:
+  dataSource: "mongo"
+
+DecisionRuleCondition:
+  dataSource: "transient"
+  public: false
+
+DecisionVariant:
+  dataSource: "transient"
+  public: false
+
+Email:
+  dataSource: "email"
+  public: false
+
+EmailRequest:
+  dataSource: 'auth'
+  public: false 
+
+Flow:
+  dataSource: "mongo"
+
+Node:
+  dataSource: "db"
+
+FlowConnection:
+  dataSource: "mongo"
+  public: false
+
+FlowNode:
+  dataSource: "mongo"
+  public: false
+
+Job:
+  dataSource: "mongo"
+
+JobFile:
+  dataSource: "mongo"
+
+JobMessage:
+  dataSource: "transient"
+  public: false
+
+JobRevision:
+  dataSource: "transient"
+  public: false
+
+OrderProduct:
+  dataSource: "rmc"
+  public: false
+
+PackageRequest:
+  dataSource: "rmc"
+  public: false
+
+Product:
+  dataSource: "mongo"
+
+ProductProperty:
+  dataSource: "transient"
+  public: false
+
+ProductField:
+  dataSource: "transient"
+  public: false
+
+Provider:
+  dataSource: "mongo"
+  public: true
+
+Room:
+  dataSource: "mongo"
+  public: true
+
+Team:
+  dataSource: "mongo"
+  public: true
+
+TeamView:
+  dataSource: "mongo"
+  public: false
+
+User:
+  dataSource: "auth"
+
+UserLink:
+  dataSource: "mongo"
+  public: false
+
+UserNotification:
+  dataSource: "mongo"
+  public: false
+
+UserPreference:
+  dataSource: "mongo"
+  public: false
+
+UserPresence:
+  dataSource: "mongo"
+
+UserRoom:
+  dataSource: 'mongo'
+  public: false
+
+UserFriend:
+  dataSource: "mongo"
+  public: false
+

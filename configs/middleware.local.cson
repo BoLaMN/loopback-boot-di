@@ -1,0 +1,4 @@
+
+"initial:before":
+    "loopback#favicon":
+      params: "$!../server/fixtures/favicon_red.ico"

@@ -1,0 +1,27 @@
+initial:
+  cors:
+    params:
+      origin: true
+      credentials: true
+      maxAge: 86400
+
+"initial:before":
+    "loopback#favicon":
+      params: "$!../server/fixtures/favicon.ico"
+
+session: {}
+
+"auth:after":
+  "./middleware/rewrite-user-literal":
+    currentUserLiteral: "me"
+
+routes: {}
+
+files:
+  "loopback#static": [
+    { params: "$!../client" }
+    { params: "$!../admin", paths: [ '/admin'] }
+  ]
+
+"final:after":
+  'strong-error-handler': {}

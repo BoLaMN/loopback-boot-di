@@ -1,0 +1,23 @@
+'./component/fixtures':
+  loadFixtures: '${FIXTURES}'
+  destroyAll: false
+
+"./component/sns": {}
+
+"./component/socket":
+  adapter:
+    host: '${REDIS_HOST}'
+
+"./component/sdk-test":
+  mountPaths: [ '/', '/admin' ]
+  websocket: true
+
+"loopback-component-explorer":
+  mountPath: '/explorer'
+
+"./component/inject": {}
+
+"./component/cache":
+  interface:
+    type: 'redis'
+    host: '${REDIS_HOST}'

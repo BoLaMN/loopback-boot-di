@@ -1,0 +1,28 @@
+{
+  "name": "loopback-boot-di",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BoLaMN/loopback-boot-di.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BoLaMN/loopback-boot-di/issues"
+  },
+  "homepage": "https://github.com/BoLaMN/loopback-boot-di#readme",
+  "dependencies": {
+    "callsite": "^1.0.0",
+    "coffee-script": "^1.12.6",
+    "cson": "^4.1.0",
+    "debug": "^2.6.8"
+  }
+}
