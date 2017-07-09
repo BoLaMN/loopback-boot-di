@@ -81,23 +81,25 @@ class Plugin
 
   value: (name, factory) ->
     @provider name, ->
+      provider = this 
+      
       value = undefined
-
       @$get = ->
         if value
           return value
-        value = injector.exec name, factory, @
+        value = injector.exec name, factory, provider
         value
     , 'value'
 
   factory: (name, factory, type = 'factory') ->
     @provider name, ->
-      instance = undefined
+      provider = this 
 
+      instance = undefined
       @$get = ->
         if instance
           return instance
-        instance = injector.exec name, factory
+        instance = injector.exec name, factory, provider
         instance
     , type
 

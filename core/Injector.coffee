@@ -47,8 +47,10 @@ class Injector
 
   get: (name, context) ->
     factory = @require name
+    provider = @[dependencies][name + 'Provider']
+    context ?= provider() if provider
     args = @inject @parse(factory), name
-    service = @decorate name, factory args...
+    service = @decorate name, factory.apply context, args 
     factory.apply context, args
 
   decorate: (name, service) ->
@@ -101,6 +103,8 @@ class Injector
       service
 
   exec: (name, factory, context) ->
+    provider = @[dependencies][name + 'Provider']
+    context ?= provider() if provider
     args = @inject @parse(factory), name
     factory.apply context, args
 

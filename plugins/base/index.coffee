@@ -195,6 +195,10 @@ module.exports = (app) ->
 
     @provider 'models', ->
       configs = {}
+      
+      # model = registry.createModel config
+      # config.fn model 
+      # app.model model, config
 
       @$get = (config) ->
         info = config.one 'model-config'
@@ -205,6 +209,8 @@ module.exports = (app) ->
 
     @provider 'mixins', ->
       configs = {}
+      
+      # modelBuilder.mixins.define mixin.name, mixin.fn 
 
       @$get = (config) ->
 
@@ -217,6 +223,8 @@ module.exports = (app) ->
     @provider 'components', ->
       configs = {}
 
+      # component.fn app, component
+
       @$get = (config) ->
 
         info = config.one 'component-config'
@@ -226,11 +234,16 @@ module.exports = (app) ->
         configs
 
     @provider 'middleware', ->
+      
+      # app.defineMiddlewarePhases phases 
+      # app.middlewareFromConfig config.fn, config 
 
       @$get = (config) ->
         config.one 'middleware'
 
     @provider 'datasources', ->
+      
+      # app.dataSource key, obj  
 
       @$get = (config) ->
         config.one 'datasources'
