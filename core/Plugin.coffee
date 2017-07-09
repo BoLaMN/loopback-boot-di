@@ -18,7 +18,7 @@ fn = (f) -> f()
 
 class Plugin
 
-  constructor: (@name, @dependencies) ->
+  constructor: (@name, @dependencies, @registry) ->
     @injector = injector
 
     @[config] = [] 
@@ -41,7 +41,7 @@ class Plugin
     caller = callsite()[1]
     callerpath = caller.getFileName()
     filepath = path.join path.dirname(callerpath), filename
-    require(filepath).bind(@)()
+    require(filepath).bind(@)(@registry)
     @
 
   config: (configurator) ->

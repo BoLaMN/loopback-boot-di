@@ -133,7 +133,7 @@ class Registry
 
   module: (name, dependencies) ->
     if dependencies
-      @set name, new Plugin name, dependencies
+      @set name, new Plugin name, dependencies, @
     else
       @get name
 
