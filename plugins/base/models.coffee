@@ -3,8 +3,6 @@ module.exports = ->
   @provider 'models', (utils) ->
     { values } = utils 
 
-    configs = {}
-
     resolve = (data) ->
       Object.keys(data).forEach (key) =>
         model = data[key]
@@ -12,7 +10,7 @@ module.exports = ->
         dependencies = values model.relations or []
 
         if model.base
-          dependencies.push model.base 
+          dependencies.push model: model.base 
 
         dependencies.forEach (dep) =>
           if not dep.model 
@@ -21,15 +19,21 @@ module.exports = ->
           dependency = data[dep.through or dep.model]
 
           if not dependency
-            #console.error "Model #{dep.model} missing."
             return 
 
-          #if dependency.type isnt 'belongsTo'
-          dependency.dependents = dependency.dependents or {}
+          if not dependency.dependents
+            Object.defineProperty dependency, 'dependents', 
+              enumrable: false
+              value: {}
+
           dependency.dependents[model.name] = model
 
-          model.metadata = model.metadata or {}
-          model.metadata[dep.model] = dependency
+          if not model.dependencies
+            Object.defineProperty model, 'dependencies', 
+              enumrable: false
+              value: {}
+
+          model.dependencies[dep.model] = dependency
       
       data
 
@@ -75,11 +79,5 @@ module.exports = ->
       info = config.one 'model-config'
       dirs = info._meta.sources
 
-      configs = config.from info, dirs 
+      prioritize resolve config.from info, dirs 
 
-      Object.defineProperty configs, 'sort', 
-        enumrable: false
-        value: ->
-          prioritize resolve configs 
-
-      configs
