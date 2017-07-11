@@ -97,9 +97,10 @@ class Injector
       args = @inject @parse(factory), owner
       service = @decorate name, factory args...
       if name is 'debug'
-        dbg = owner or name
-        plugin = debug @[plugins][dbg]
-        service = service plugin + ':' + dasheize(dbg)
+        dbg = owner or name or ''
+        if @[plugins][dbg]
+          plugin = debug(@[plugins][dbg]) + ':'
+        service = service (plugin or '') + dasheize(dbg)
       service
 
   exec: (name, factory, context) ->

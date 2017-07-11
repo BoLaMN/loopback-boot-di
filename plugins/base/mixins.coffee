@@ -1,14 +1,22 @@
 module.exports = ->
 
   @provider 'mixins', ->
-    configs = {}
-    
-    # modelBuilder.mixins.define mixin.name, mixin.fn 
+    configs = {} 
 
     @$get = (config) ->
+      { definition } = config.one 'model-config'
 
-      info = config.one 'model-config'
-      dirs = info._meta.mixins 
-
-      configs = config.from info, dirs    
+      dirs = definition._meta.mixins 
+      configs = config.from definition, dirs    
+      
       configs
+
+  @run (mixins, events, loopback) ->
+    { modelBuilder } = loopback.registry 
+
+    for key, value of mixins
+      modelBuilder.mixins.define value.name, value.fn 
+      
+      events.emit 'mixins:' + key, value 
+
+    return

@@ -80,7 +80,8 @@ module.exports = (app) ->
         name = path.basename file
         base = name.split('.')[0] 
 
-        result[base] = merge result[base] or {}, config
+        result[base] ?= {}
+        result[base].definition = merge result[base].definition or {}, config
 
       result
 
@@ -107,13 +108,14 @@ module.exports = (app) ->
         name = path.basename file, ext
         base = camelize name.split('.')[0] 
 
-        result[base] = list[base]
+        result[base] ?= {}
+        result[base].name = base 
+        result[base].config = list[base] or {}
 
         if typeof config is 'function'
-          result[base] ?= {}
           result[base].fn = config
         else 
-          result[base] = merge result[base] or {}, config
+          result[base].definition = merge result[base].definition or {}, config
 
       result
     

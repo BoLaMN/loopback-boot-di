@@ -16,6 +16,10 @@ module.exports = (app) ->
     @include './config'
     @include './middleware'
     @include './parsers'
+    @include './events'
+
+    @factory 'loopback', ->
+      require('loopback')()
 
     @config (parsersProvider, csonParser, coffeeScript) ->
 

@@ -23,6 +23,7 @@
     "callsite": "^1.0.0",
     "coffee-script": "^1.12.6",
     "cson": "^4.1.0",
-    "debug": "^2.6.8"
+    "debug": "^2.6.8",
+    "loopback": "^3.8.0"
   }
 }

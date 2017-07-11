@@ -13,3 +13,13 @@ module.exports = (app) ->
           configs.push config
 
       configs
+
+  @run (boot, events, loopback) ->
+
+    for value in boot
+      value.fn loopback
+
+      events.emit 'boot', value 
+
+    return
+

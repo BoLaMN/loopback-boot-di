@@ -102,7 +102,7 @@ class Utils
   @get: (obj, path = '') ->
     attrs = path.split '.'
     attrs.reduce((acc, attr) ->
-      acc[attr] if acc[attr]?
+      acc[attr] if acc?[attr]?
     , obj) or undefined
 
   @set: (obj, path = '', value) ->
@@ -114,20 +114,15 @@ class Utils
       acc[attr] 
     , obj)[key] = value
 
-  @flatten: (arr, ret) ->
-    if !Array.isArray(arr)
+  @flatten: (arr, ret = []) ->
+    if arr and not Array.isArray arr
       return [ arr ]
 
-    ret = ret or []
-    i = 0
-
-    while i < arr.length
-      if Array.isArray(arr[i])
-        exports.flatten arr[i], ret
+    for ar in arr 
+      if Array.isArray ar
+        Utils.flatten ar, ret
       else
-        ret.push arr[i]
-
-      ++i
+        ret.push ar
 
     ret
 

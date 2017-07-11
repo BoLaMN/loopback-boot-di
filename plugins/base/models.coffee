@@ -71,13 +71,42 @@ module.exports = ->
 
       satisfy data, ordered, remaining
 
-    # model = registry.createModel config
-    # config.fn model 
-    # app.model model, config
-
     @$get = (config) ->
-      info = config.one 'model-config'
-      dirs = info._meta.sources
+      { definition } = config.one 'model-config'
 
-      prioritize resolve config.from info, dirs 
+      dirs = definition._meta.sources
 
+      prioritize resolve config.from definition, dirs 
+
+  @run (models, loopback, debug, events, utils) ->
+    registry = loopback.registry or loopback.loopback
+    
+    models.forEach (data) ->
+      name = data.name
+
+      if not data.definition
+        model = registry.getModel name
+
+        if not model
+          throw new Error 'Cannot configure unknown model %s', name 
+        
+        debug 'Configuring existing model %s', name
+      else
+        debug 'Creating new model %s %j', name, data.definition
+
+        { mixins } = data.definition
+        
+        delete data.definition.mixins
+
+        mixinNames = Object.keys(mixins or {})
+
+        events.get 'mixins', mixinNames, (mixes) ->
+          model = registry.createModel data.definition 
+
+          if data.fn
+            debug 'Loading customization script %s'
+
+            data.fn model
+
+          events.get 'datasources', data.dataSource, (datasource) ->
+            loopback.model model, data.config
