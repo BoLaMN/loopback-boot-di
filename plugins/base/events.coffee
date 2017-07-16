@@ -19,8 +19,10 @@ module.exports = ->
 
     id = 0
 
-    add: (ev, cb) ->
+    add: (event, cb) ->
       cb.id = id++
+      
+      ev = event.toLowerCase()
 
       events[ev] ?= []
       events[ev].push cb
@@ -32,7 +34,8 @@ module.exports = ->
 
       events[ev].length
 
-    on: (ev, cb) ->
+    on: (event, cb) ->
+      ev = event.toLowerCase()
       @add ev, cb
       @
 
@@ -57,9 +60,12 @@ module.exports = ->
 
       @
 
-    emit: (ev, args...) ->
+    data: data 
+    
+    emit: (event, args...) ->
       itr = iterate.bind @
-      
+      ev = event.toLowerCase()
+
       data[ev] ?= args
 
       itr ev, (e) =>
@@ -69,8 +75,10 @@ module.exports = ->
 
       @
 
-    once: (ev, cb) ->
+    once: (event, cb) ->
       return @ if not cb
+
+      ev = event.toLowerCase()
 
       c = =>
         events[ev].splice idx, 1
@@ -83,13 +91,18 @@ module.exports = ->
     get: (type, names, next) ->
 
       get = (name, cb) =>
-        @once type + ':' + name, cb
+        ev = type + ':' + name.toLowerCase()
+
+        if data[ev] 
+          return cb data[ev] 
+
+        @once ev, cb
 
       if typeof next isnt 'function'
         if Array.isArray names
           names.map (name) =>
-            @[name]
+            data[name]
         else
-          @[names]
+          data[names]
       else
         each names, get, next

@@ -1,0 +1,5 @@
+"./connectors/email": {}
+"./connectors/remote": {}
+"./connectors/mail": {}
+"./connectors/mongo": {}
+"./connectors/redis": {}

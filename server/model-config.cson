@@ -1,24 +1,15 @@
 _meta:
   mixins: [
-    "loopback/common/mixins"
-    "loopback/server/mixins"
+    "common/mixins"
+    "server/mixins"
     "../common/mixins"
     "./mixins"
   ]
   sources: [
-    "loopback/common/models"
-    "loopback/server/models"
+    "common/models"
+    "server/models"
     "../common/models"
     "./models"
-    "./models/decision"
-    "./models/queue"
-    "./models/chat"
-    "./models/flow"
-    "./models/job"
-    "./models/card"
-    "./models/product"
-    "./models/user"
-    "./models/deadline"
   ]
 
 Card:

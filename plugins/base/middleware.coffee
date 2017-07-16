@@ -1,17 +1,32 @@
 module.exports = ->
 
-  @provider 'middleware', ->
+  @provider 'middlewares', ->
+    configs = {}
     
     # app.defineMiddlewarePhases phases 
     # app.middlewareFromConfig config.fn, config 
 
     @$get = (config) ->
-      config.one 'middleware'
+      { definition } = config.one 'middleware'
 
-  @run (middleware, events, loopback) ->
+      configs = definition
+      configs
 
-    for key, value of middleware
-      #value.fn loopback, value.definition
-      
-      events.emit 'middleware:' + key, value 
+  @run (middlewares, events, loopback) ->
+    phases = Object.keys middlewares 
+
+    loopback.defineMiddlewarePhases phases 
+
+    phases.forEach (key) ->
+      middleware = middlewares[key]
+
+      Object.keys(middleware).forEach (name) ->
+        value = middleware[name]
+        console.log name, value 
+
+        loopback.middlewareFromConfig value.fn, value.config
+
+        events.emit 'middlewares:' + name, value 
+
+    return 
 

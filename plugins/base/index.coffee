@@ -17,6 +17,7 @@ module.exports = (app) ->
     @include './middleware'
     @include './parsers'
     @include './events'
+    @include './connectors'
 
     @factory 'loopback', ->
       require('loopback')()

@@ -7,16 +7,18 @@ module.exports = ->
       { definition } = config.one 'model-config'
 
       dirs = definition._meta.mixins 
-      configs = config.from definition, dirs    
       
+      configs = config.from [ '**' ], dirs    
       configs
 
   @run (mixins, events, loopback) ->
     { modelBuilder } = loopback.registry 
 
-    for key, value of mixins
-      modelBuilder.mixins.define value.name, value.fn 
+    Object.keys(mixins).forEach (key) ->
+      mixin = mixins[key]
       
-      events.emit 'mixins:' + key, value 
+      modelBuilder.mixins.define mixin.name, mixin.fn 
+
+      events.emit 'mixins:' + key, mixin 
 
     return

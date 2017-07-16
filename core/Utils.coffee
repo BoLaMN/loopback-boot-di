@@ -79,25 +79,27 @@ class Utils
     .map (arg) -> arg.replace(/\/\*.*\*\//, '').trim()
     .filter (arg) -> arg
 
-  @each: (fns, iterate, callback) ->
+  @each: (items, iterate, callback = ->) ->
+    data = []
     count = 0
 
     run = (item, index) ->
-      iterate item, (err, obj) ->
-        if err
-          callback err
-          callback = ->
-          return
+      iterate item, (obj) ->
+        if not index
+          callback obj
+        else
+          data[index] = obj
 
         count += 1
 
-        if count is fns.length
-          callback()
+        if count is items.length
+          callback data
 
-    if not fns.length
-      return callback()
-
-    fns.forEach run
+    if Array.isArray items
+      if not items.length
+        return callback()
+      items.forEach run
+    else run items
 
   @get: (obj, path = '') ->
     attrs = path.split '.'

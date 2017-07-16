@@ -4,7 +4,7 @@ module.exports = (app) ->
     { dasheize, underscore, camelize } = inflector
 
     directories = app.directories.map (directory) ->
-      path.join directory, 'configs'
+      path.join directory, 'server'
 
     addWithSuffixes = (list, base, suffixes...) ->
       add = (element) ->
@@ -37,7 +37,7 @@ module.exports = (app) ->
 
       files
 
-    get = (dirs, configs, fn) ->
+    get = (dirs = directories, configs, fn) ->
       if typeof configs is 'function'
         return get directories, dirs, configs
 
@@ -45,12 +45,15 @@ module.exports = (app) ->
         dirs = [ dirs ]
 
       parsers = injector.get 'parsers'
-          
+      
       names = configs.join ',' 
-      exts = parsers.exts.join ','
+      exts = parsers.exts.join ',.'
 
-      pattern = '{' + names + '}.{' + exts + '}'
+      if configs.length > 1
+        names = '{' + names + '}'
 
+      pattern = names + '{.' + exts + '}'
+    
       for dir in dirs
         ptrn = path.resolve path.join dir, pattern
         files = glob.sync ptrn
@@ -85,23 +88,26 @@ module.exports = (app) ->
 
       result
 
-    from = (list, dirs = directories) ->
+    from = (list, dirs) ->
       result = {}
 
-      files = Object.keys list 
+      if Array.isArray list
+        files = list
+      else
+        files = Object.keys list 
 
-      files.forEach (file) ->
-        orig = file.toLowerCase()
+        files.forEach (file) ->
+          orig = file.toLowerCase()
 
-        dash = dasheize file 
+          dash = dasheize file 
 
-        if dash isnt orig
-          files.push dash
+          if dash isnt orig
+            files.push dash
 
-        under = underscore file 
+          under = underscore file 
 
-        if under isnt orig
-          files.push under
+          if under isnt orig
+            files.push under
 
       get dirs, files, (file, config) =>
         ext = path.extname file

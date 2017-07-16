@@ -1,25 +1,22 @@
 module.exports = (app) ->
 
-  @provider 'boot', ->
-    configs = []
+  @provider 'boots', ->
+    configs = {}
 
     @$get = (config, path) ->
-
       dirs = app.directories.map (directory) ->
         path.join directory, 'boot'
 
-      config.get dirs, [ '**' ], (file, config) =>
-        if typeof config is 'function'
-          configs.push config
-
+      configs = config.from [ '**' ], dirs 
       configs
 
-  @run (boot, events, loopback) ->
+  @run (boots, events, loopback) ->
 
-    for value in boot
-      value.fn loopback
+    Object.keys(boots).forEach (key) ->
+      boot = boots[key]
+      boot.fn loopback
 
-      events.emit 'boot', value 
+      events.emit 'boots:' + key, boot 
 
     return
 

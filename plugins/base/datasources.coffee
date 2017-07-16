@@ -1,22 +1,23 @@
 module.exports = ->
 
   @provider 'datasources', ->
-    
-    # app.dataSource key, obj  
+    configs = {}
 
     @$get = (config) ->
-      info = config.one 'datasources'
-      
-      dirs = Object.keys info 
-      configs = config.from info, dirs
-      
+      { definition } = config.one 'datasources'
+
+      configs = definition
       configs
 
   @run (events, datasources, loopback) ->
 
-    for key, value of datasources
-      loopback.dataSource key, value  
-      
-      events.emit 'datasources:' + key, value 
+    Object.keys(datasources).forEach (key) ->
+      datasource = datasources[key]
+
+      events.get 'connectors', datasource.connector, (connector) ->
+        console.log key, datasource.connector
+        loopback.dataSource key, datasource  
+
+        events.emit 'datasources:' + key, datasource 
 
     return

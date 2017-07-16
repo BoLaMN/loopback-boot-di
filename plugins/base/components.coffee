@@ -3,22 +3,19 @@ module.exports = ->
   @provider 'components', ->
     configs = {}
 
-    # 
-
     @$get = (config) ->
-      info = config.one 'component-config'
-      
-      dirs = Object.keys info 
-      configs = config.from info, dirs
+      { definition } = config.one 'component-config'
 
+      configs = config.from definition
       configs
 
   @run (components, events, loopback) ->
 
-    for key, value of components
-      value.fn loopback, value.definition
+    Object.keys(components).forEach (key) ->
+      component = components[key]
+      component.fn loopback, component.definition
 
-      events.emit 'components:' + key, value 
+      events.emit 'components:' + key, component 
 
     return
 

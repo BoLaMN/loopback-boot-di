@@ -1,16 +1,29 @@
 module.exports = ->
 
-  @provider 'models', (utils) ->
+  @provider 'models', ->
+    configs = {} 
+
+    @$get = (config) ->
+      { definition } = config.one 'model-config'
+
+      dirs = definition._meta.sources
+      
+      configs = config.from definition, dirs    
+      configs
+
+  @run (models, loopback, debug, events, utils) ->
+    registry = loopback.registry or loopback.loopback
+
     { values } = utils 
 
     resolve = (data) ->
       Object.keys(data).forEach (key) =>
         model = data[key]
 
-        dependencies = values model.relations or []
+        dependencies = values model.definition.relations or []
 
-        if model.base
-          dependencies.push model: model.base 
+        if model.definition.base
+          dependencies.push model: model.definition.base 
 
         dependencies.forEach (dep) =>
           if not dep.model 
@@ -42,10 +55,10 @@ module.exports = ->
       target = [].concat ordered
 
       source.forEach (model, index) ->
-        dependencies = values model.relations
+        dependencies = values model.definition.relations
 
-        if model.base
-          dependencies.push model.base 
+        if model.definition.base
+          dependencies.push model.definition.base 
 
         isSatisfied = dependencies.filter (dependency) ->
           not (dependency.type is 'belongsTo' or 
@@ -65,26 +78,14 @@ module.exports = ->
       remaining = [].concat values data
 
       remaining.forEach (model, index) ->
-        if not model.base and (not model.relations or Object.keys(model.relations).length is 0)
+        if not model.definition.base and (not model.definition.relations or Object.keys(model.definition.relations).length is 0)
           ordered.push model
           remaining.splice index, 1
 
       satisfy data, ordered, remaining
 
-    @$get = (config) ->
-      { definition } = config.one 'model-config'
-
-      dirs = definition._meta.sources
-
-      prioritize resolve config.from definition, dirs 
-
-  @run (models, loopback, debug, events, utils) ->
-    registry = loopback.registry or loopback.loopback
-    
-    models.forEach (data) ->
-      name = data.name
-
-      if not data.definition
+    prioritize(resolve(models)).forEach ({ name, fn, definition, config }) ->
+      if not definition
         model = registry.getModel name
 
         if not model
@@ -92,21 +93,18 @@ module.exports = ->
         
         debug 'Configuring existing model %s', name
       else
-        debug 'Creating new model %s %j', name, data.definition
+        debug 'Creating new model %s %j', name, definition
 
-        { mixins } = data.definition
-        
-        delete data.definition.mixins
+        events.get 'datasources', config.dataSource, (datasource) ->
+          names = Object.keys definition.mixins or {} 
+          
+          events.get 'mixins', names, (mixins) ->
 
-        mixinNames = Object.keys(mixins or {})
+            model = registry.createModel definition 
 
-        events.get 'mixins', mixinNames, (mixes) ->
-          model = registry.createModel data.definition 
+            if fn
+              debug 'Loading customization script %s'
 
-          if data.fn
-            debug 'Loading customization script %s'
+              fn model
 
-            data.fn model
-
-          events.get 'datasources', data.dataSource, (datasource) ->
-            loopback.model model, data.config
+            loopback.model model, config

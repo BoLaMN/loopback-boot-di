@@ -41,7 +41,7 @@ email:
 
 auth:
   name: 'auth'
-  connector: 'internal'
+  connector: 'remote'
   url: '${auth}'
   auth:
     url: '${auth}'
@@ -51,7 +51,7 @@ auth:
 
 rmc:
   name: 'rmc'
-  connector: 'internal'
+  connector: 'remote'
   url: '${rmc}'
   auth:
     url: '${auth}'
